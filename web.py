@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm
+from flask import Flask, render_template, url_for, flash, redirect, request
+from forms import RegistrationForm, LoginForm
 from flask_behind_proxy import FlaskBehindProxy
 from flask_sqlalchemy import SQLAlchemy
 import time, random, threading
@@ -41,15 +41,11 @@ def second_page():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit(): # checks if entries are valid
-      
-        if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data, password=form.password.data)
-            db.session.add(user)
-            db.session.commit()
-    
+        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
         return redirect(url_for('home')) # if so - send to home page
-      
       
     return render_template('register.html', title='Register', form=form)
   
@@ -58,6 +54,24 @@ def captions():
     TITLE = "DeadPoetsSociety"
 #     FILE_NAME = "DeadPoetsSociety.wav"
     return render_template('captions.html', songName=TITLE, file=FILE_NAME)
+
+# Route for handling the login page logic
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+      user = User.query.filter_by(username=form.username.data).first()
+      if user == None:
+        flash(f'Account created for {form.username.data}!', 'success')
+        return render_template('login.html', title='Login', form=form)
+#           flash(f'Welcome {form.username.data}!', 'success')
+#           return redirect(url_for('home')) # if so - send to home page
+#     flash("Invalid Credentials")
+      else: 
+        return redirect(url_for('home'))
+    return render_template('login.html', title='Login', form=form)
+#       return render_template('login.html', error=error)
+
 
 @app.before_first_request
 def before_first_request():
@@ -96,3 +110,6 @@ def update_captions():
   
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
+    
+    
+    
