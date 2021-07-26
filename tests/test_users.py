@@ -23,6 +23,12 @@ class UsersTests(unittest.TestCase):
                                       password=password, 
                                       confirm_password=password),
                             follow_redirects=True)
+      
+    def login(self, username, password):
+        return self.app.post('/login',
+                            data=dict(username=username,
+                                      password=password),
+                            follow_redirects=True)
 
     def test_valid_user_registration(self):
         response = self.register('test', 'test@example.com', 'FlaskIsAwesome')
@@ -35,6 +41,11 @@ class UsersTests(unittest.TestCase):
     def test_invalid_email_registration(self):
         response = self.register('test2', 'test@example', 'FlaskIsAwesome')
         self.assertIn(b'Invalid email address.', response.data)
+ 
+    def test_invalid_username_login(self):
+        response = self.login('t', 'FlaskIsAwesome')
+        self.assertIn(b'Field must be between 2 and 20 characters long.', response.data)
+    
 
 
 if __name__ == "__main__":
