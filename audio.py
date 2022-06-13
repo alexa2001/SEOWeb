@@ -16,5 +16,3 @@ def printWAV(FILE_NAME, pos, clip):
         except sr.RequestError as e:
             text += "Could not request results; {0}".format(e)+ "\n"
     return text
-
-#test
